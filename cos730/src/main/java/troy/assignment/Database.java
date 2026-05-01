@@ -26,14 +26,31 @@ public class Database {
     }
 
     private void createTable(Connection conn) throws SQLException {
-        String sql = "CREATE TABLE IF NOT EXISTS submissions (" +
+        String submissions = "CREATE TABLE IF NOT EXISTS submissions (" +
                 "id INTEGER PRIMARY KEY," +
                 "title TEXT NOT NULL," +
                 "author TEXT NOT NULL," +
                 "date TEXT NOT NULL," +
                 "value REAL NOT NULL" +
                 ");";
-        conn.createStatement().execute(sql);
+        String assignments = "CREATE TABLE IF NOT EXISTS assignments (" +
+                "reviewer_id INTEGER NOT NULL," +
+                "submission_id INTEGER NOT NULL," +
+                "PRIMARY KEY (reviewer_id, submission_id)," +
+                "FOREIGN KEY (reviewer_id) REFERENCES reviewers(id)," +
+                "FOREIGN KEY (submission_id) REFERENCES submissions(id)" +
+                ");";
+        String scores = "CREATE TABLE IF NOT EXISTS scores (" +
+                "submission_id INTEGER NOT NULL," +
+                "reviewer_id INTEGER NOT NULL," +
+                "score REAL NOT NULL," +
+                "PRIMARY KEY (submission_id, reviewer_id)," +
+                "FOREIGN KEY (submission_id) REFERENCES submissions(id)," +
+                "FOREIGN KEY (reviewer_id) REFERENCES reviewers(id)" +
+                ");";
+        conn.createStatement().execute(scores);
+        conn.createStatement().execute(submissions);
+        conn.createStatement().execute(assignments);
     }
 
     private List<String[]> parseCSV(File file) throws IOException {
@@ -85,9 +102,32 @@ public class Database {
                         rs.getInt("id"),
                         rs.getString("name"),
                         rs.getInt("assigned_study_id"),
-                        rs.getInt("study_count")));
+                        rs.getInt("study_count"),
+                        this));
             }
         }
         return reviewers;
     }
+
+    public void assignReview(int reviewerId, int submissionId) throws SQLException {
+        String sql = "INSERT OR IGNORE INTO assignments (reviewer_id, submission_id) VALUES (?, ?)";
+        try (Connection conn = connect();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, reviewerId);
+            stmt.setInt(2, submissionId);
+            stmt.executeUpdate();
+        }
+    }
+
+    public void saveScore(int submissionId, int reviewerId, double score) throws SQLException {
+        String sql = "INSERT OR REPLACE INTO scores (submission_id, reviewer_id, score) VALUES (?, ?, ?)";
+        try (Connection conn = connect();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, submissionId);
+            stmt.setInt(2, reviewerId);
+            stmt.setDouble(3, score);
+            stmt.executeUpdate();
+        }
+    }
+
 }

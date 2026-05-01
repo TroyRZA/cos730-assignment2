@@ -29,11 +29,19 @@ public class SubmissionController {
                 int submissionId = db.saveSubmission(selectedFile);
                 ReviewerManager rm = new ReviewerManager(db);
                 List<Reviewer> filteredReviewers = rm.getAvailableReviewers(submissionId);
+                statusLabel.setText("Valid - " + filteredReviewers.size() + " reviewers available");
+                statusLabel.setStyle("-fx-text-fill: green;");
+                NotificationService ns = new NotificationService(message -> javafx.application.Platform.runLater(() -> {
+                    statusLabel.setText(message);
+                    statusLabel.setStyle("-fx-text-fill: blue;");
+                    statusLabel.setVisible(true);
+                    statusLabel.setManaged(true);
+                }));
+                EvaluationManager em = new EvaluationManager(db, ns);
                 for (Reviewer reviewer : filteredReviewers) {
                     reviewer.assignReview(submissionId);
                 }
-                statusLabel.setText("Valid - " + filteredReviewers.size() + " reviewers available");
-                statusLabel.setStyle("-fx-text-fill: green;");
+                em.startEvaluation(submissionId, filteredReviewers);
             } catch (IllegalArgumentException e) {
                 statusLabel.setText("Invalid");
                 statusLabel.setStyle("-fx-text-fill: red;");
