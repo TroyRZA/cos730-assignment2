@@ -7,6 +7,7 @@ public class NotificationService {
     private final Consumer<String> uiCallback;
 
     public NotificationService(Consumer<String> uiCallback) {
+        System.out.println("NotificationService: called sendNotification() on UI");
         this.uiCallback = uiCallback;
     }
 
@@ -19,6 +20,7 @@ public class NotificationService {
     }
 
     public void notifyRevision() {
+
         uiCallback.accept("Submission requires revision.");
     }
 }

@@ -13,20 +13,22 @@ public class ReviewerManager {
     }
 
     public List<Reviewer> getAvailableReviewers(int submissionId) throws SQLException {
+        System.out.println("SubmissionController called: getAvailableReviewers() on ReviewerManager");
         List<Reviewer> reviewers = database.fetchReviewers();
         reviewers = filterConflicts(reviewers, submissionId);
         reviewers = checkWorkload(reviewers);
-        // filteredReviewers()
         return reviewers;
     }
 
     private List<Reviewer> filterConflicts(List<Reviewer> reviewers, int submissionId) {
+        System.out.println("ReviewerManager: self-called filterConflicts(reviewerList)");
         return reviewers.stream()
                 .filter(r -> r.getAssignedStudyId() != submissionId)
                 .collect(Collectors.toList());
     }
 
     private List<Reviewer> checkWorkload(List<Reviewer> reviewers) {
+        System.out.println("ReviewerManager: self-called checkWorkload(reviewerList)");
         return reviewers.stream()
                 .filter(r -> r.getStudyCount() <= 5)
                 .collect(Collectors.toList());

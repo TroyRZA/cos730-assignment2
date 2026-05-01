@@ -16,6 +16,7 @@ public class Validator {
     private static final String DELIMITER = ",";
 
     public Validator(File file) throws IOException {
+        System.out.println("SubmissionController called Validator: validateFormat(data)");
         if (!file.getName().toLowerCase().endsWith(".csv")) {
             throw new IOException("File is not a CSV: " + file.getName());
         }

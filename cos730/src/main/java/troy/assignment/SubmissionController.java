@@ -16,6 +16,7 @@ public class SubmissionController {
 
     @FXML
     private void submitResearchOutput() {
+        System.out.println("Researcher clicked: submitResearchOutput");
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select CSV File");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
@@ -23,37 +24,46 @@ public class SubmissionController {
         File selectedFile = fileChooser.showOpenDialog(new Stage());
 
         if (selectedFile != null) {
-            try {
-                new Validator(selectedFile);
-                Database db = new Database();
-                int submissionId = db.saveSubmission(selectedFile);
-                ReviewerManager rm = new ReviewerManager(db);
-                List<Reviewer> filteredReviewers = rm.getAvailableReviewers(submissionId);
-                statusLabel.setText("Valid - " + filteredReviewers.size() + " reviewers available");
-                statusLabel.setStyle("-fx-text-fill: green;");
-                NotificationService ns = new NotificationService(message -> javafx.application.Platform.runLater(() -> {
-                    statusLabel.setText(message);
-                    statusLabel.setStyle("-fx-text-fill: blue;");
-                    statusLabel.setVisible(true);
-                    statusLabel.setManaged(true);
-                }));
-                EvaluationManager em = new EvaluationManager(db, ns);
-                for (Reviewer reviewer : filteredReviewers) {
-                    reviewer.assignReview(submissionId);
-                }
-                em.startEvaluation(submissionId, filteredReviewers);
-            } catch (IllegalArgumentException e) {
-                statusLabel.setText("Invalid");
-                statusLabel.setStyle("-fx-text-fill: red;");
-            } catch (IOException e) {
-                statusLabel.setText("Error reading file");
-                statusLabel.setStyle("-fx-text-fill: red;");
-            } catch (SQLException e) {
-                statusLabel.setText("Database error");
-                statusLabel.setStyle("-fx-text-fill: red;");
-            }
-            statusLabel.setVisible(true);
-            statusLabel.setManaged(true);
+            submit(selectedFile);
         }
+    }
+
+    private void submit(File selectedFile) {
+        System.out.println("UI: submit(data)");
+        try {
+            new Validator(selectedFile);
+            Database db = new Database();
+            int submissionId = db.saveSubmission(selectedFile);
+            ReviewerManager rm = new ReviewerManager(db);
+            List<Reviewer> filteredReviewers = rm.getAvailableReviewers(submissionId);
+            statusLabel.setText("Valid - " + filteredReviewers.size() + " reviewers available");
+            statusLabel.setStyle("-fx-text-fill: green;");
+            NotificationService ns = new NotificationService(message -> javafx.application.Platform.runLater(() -> {
+                statusLabel.setText(message);
+                statusLabel.setStyle("-fx-text-fill: blue;");
+                statusLabel.setVisible(true);
+                statusLabel.setManaged(true);
+            }));
+            EvaluationManager em = new EvaluationManager(db, ns);
+            System.out.println("loop [assign reviewers]");
+            for (Reviewer reviewer : filteredReviewers) {
+                reviewer.assignReview(submissionId);
+            }
+            em.startEvaluation(submissionId, filteredReviewers);
+        } catch (IllegalArgumentException e) {
+            System.out.println("SubmissionController: returnError()");
+            statusLabel.setText("Invalid");
+            statusLabel.setStyle("-fx-text-fill: red;");
+        } catch (IOException e) {
+            System.out.println("SubmissionController: returnError()");
+            statusLabel.setText("Error reading file");
+            statusLabel.setStyle("-fx-text-fill: red;");
+        } catch (SQLException e) {
+            System.out.println("SubmissionController: returnError()");
+            statusLabel.setText("Database error");
+            statusLabel.setStyle("-fx-text-fill: red;");
+        }
+        statusLabel.setVisible(true);
+        statusLabel.setManaged(true);
     }
 }

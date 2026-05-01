@@ -34,10 +34,8 @@ public class Reviewer {
     }
 
     public void assignReview(int submissionId) throws SQLException {
+        System.out.println("SubmissionController: called assignReview() on Reviewer");
         database.assignReview(this.id, submissionId);
     }
 
-    public double submitScore(int submissionId) {
-        return Math.round(Math.random() * 100);
-    }
 }

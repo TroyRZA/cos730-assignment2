@@ -68,6 +68,7 @@ public class Database {
     }
 
     public int saveSubmission(File file) throws IOException, SQLException {
+        System.out.println("SubmissionController:  called saveSubmission(data) on Database");
         List<String[]> rows = parseCSV(file);
         String sql = "INSERT OR REPLACE INTO submissions (id, title, author, date, value) VALUES (?, ?, ?, ?, ?)";
         int firstId = -1;
@@ -90,6 +91,7 @@ public class Database {
     }
 
     public List<Reviewer> fetchReviewers() throws SQLException {
+        System.out.println("ReviewerManager: called fetchReviewers() on Database");
         String sql = "SELECT r.id, r.name, r.assigned_study_id, COUNT(r2.id) as study_count " +
                 "FROM reviewers r " +
                 "LEFT JOIN reviewers r2 ON r2.assigned_study_id = r.assigned_study_id " +
@@ -110,6 +112,7 @@ public class Database {
     }
 
     public void assignReview(int reviewerId, int submissionId) throws SQLException {
+        System.out.println("SubmissionController: assignReview()");
         String sql = "INSERT OR IGNORE INTO assignments (reviewer_id, submission_id) VALUES (?, ?)";
         try (Connection conn = connect();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -120,6 +123,7 @@ public class Database {
     }
 
     public void saveScore(int submissionId, int reviewerId, double score) throws SQLException {
+        System.out.println("EvaluationManager called: saveScore(score) on Database");
         String sql = "INSERT OR REPLACE INTO scores (submission_id, reviewer_id, score) VALUES (?, ?, ?)";
         try (Connection conn = connect();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
