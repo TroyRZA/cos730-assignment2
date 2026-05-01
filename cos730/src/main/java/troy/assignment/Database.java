@@ -72,20 +72,20 @@ public class Database {
         return firstId;
     }
 
-    public List<String[]> fetchReviewers() throws SQLException {
-        String sql = "SELECT r.id, r.name, COUNT(r2.id) as study_count " +
+    public List<Reviewer> fetchReviewers() throws SQLException {
+        String sql = "SELECT r.id, r.name, r.assigned_study_id, COUNT(r2.id) as study_count " +
                 "FROM reviewers r " +
                 "LEFT JOIN reviewers r2 ON r2.assigned_study_id = r.assigned_study_id " +
                 "GROUP BY r.id";
-        List<String[]> reviewers = new ArrayList<>();
+        List<Reviewer> reviewers = new ArrayList<>();
         try (Connection conn = connect();
                 var rs = conn.createStatement().executeQuery(sql)) {
             while (rs.next()) {
-                reviewers.add(new String[] {
-                        String.valueOf(rs.getInt("id")),
+                reviewers.add(new Reviewer(
+                        rs.getInt("id"),
                         rs.getString("name"),
-                        String.valueOf(rs.getInt("study_count"))
-                });
+                        rs.getInt("assigned_study_id"),
+                        rs.getInt("study_count")));
             }
         }
         return reviewers;

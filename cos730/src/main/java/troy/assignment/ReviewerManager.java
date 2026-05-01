@@ -12,22 +12,24 @@ public class ReviewerManager {
         this.database = database;
     }
 
-    public List<String[]> getAvailableReviewers(int submissionId) throws SQLException {
-        List<String[]> reviewers = database.fetchReviewers();
+    public List<Reviewer> getAvailableReviewers(int submissionId) throws SQLException {
+        List<Reviewer> reviewers = database.fetchReviewers();
         reviewers = filterConflicts(reviewers, submissionId);
         reviewers = checkWorkload(reviewers);
+        // filteredReviewers()
         return reviewers;
     }
 
-    private List<String[]> filterConflicts(List<String[]> reviewers, int submissionId) {
+    private List<Reviewer> filterConflicts(List<Reviewer> reviewers, int submissionId) {
         return reviewers.stream()
-                .filter(r -> !String.valueOf(submissionId).equals(r[2]))
+                .filter(r -> r.getAssignedStudyId() != submissionId)
                 .collect(Collectors.toList());
     }
 
-    private List<String[]> checkWorkload(List<String[]> reviewers) {
+    private List<Reviewer> checkWorkload(List<Reviewer> reviewers) {
         return reviewers.stream()
-                .filter(r -> Integer.parseInt(r[2]) <= 5)
+                .filter(r -> r.getStudyCount() <= 5)
                 .collect(Collectors.toList());
     }
+
 }
