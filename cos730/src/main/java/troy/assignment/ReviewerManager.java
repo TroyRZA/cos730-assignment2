@@ -17,7 +17,7 @@ public class ReviewerManager {
         List<Reviewer> reviewers = database.fetchReviewers();
         List<Reviewer> filteredReviewers = selectReviewers(reviewers, researchId);
         for (Reviewer reviewer : filteredReviewers) {
-            database.assignReview(reviewer.getId(), researchId);
+            reviewer.assignReview(researchId);
         }
     }
 
