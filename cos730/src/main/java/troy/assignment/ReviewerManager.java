@@ -12,18 +12,20 @@ public class ReviewerManager {
         this.database = database;
     }
 
-    public List<Reviewer> getAvailableReviewers(int submissionId) throws SQLException {
-        System.out.println("SubmissionController called: getAvailableReviewers() on ReviewerManager");
+    public void assignReviewers(int researchId) throws SQLException {
+        System.out.println("ReviewerManager: called assignReviewers(researchId)");
         List<Reviewer> reviewers = database.fetchReviewers();
-        reviewers = filterConflicts(reviewers, submissionId);
+        reviewers = filterConflicts(reviewers, researchId);
         reviewers = checkWorkload(reviewers);
-        return reviewers;
+        for (Reviewer reviewer : reviewers) {
+            database.assignReview(reviewer.getId(), researchId);
+        }
     }
 
-    private List<Reviewer> filterConflicts(List<Reviewer> reviewers, int submissionId) {
+    private List<Reviewer> filterConflicts(List<Reviewer> reviewers, int researchId) {
         System.out.println("ReviewerManager: self-called filterConflicts(reviewerList)");
         return reviewers.stream()
-                .filter(r -> r.getAssignedStudyId() != submissionId)
+                .filter(r -> r.getAssignedStudyId() != researchId)
                 .collect(Collectors.toList());
     }
 
