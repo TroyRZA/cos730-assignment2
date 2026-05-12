@@ -7,9 +7,11 @@ import java.util.stream.Collectors;
 public class ReviewerManager {
 
     private final Database database;
+    private final EvaluationManager evaluationManager;
 
-    public ReviewerManager(Database database) {
+    public ReviewerManager(Database database, EvaluationManager evaluationManager) {
         this.database = database;
+        this.evaluationManager = evaluationManager;
     }
 
     public void assignReviewers(int researchId) throws SQLException {
@@ -19,6 +21,7 @@ public class ReviewerManager {
         for (Reviewer reviewer : filteredReviewers) {
             reviewer.assignReview(researchId);
         }
+        evaluationManager.startEvaluation(researchId, filteredReviewers);
     }
 
     private List<Reviewer> selectReviewers(List<Reviewer> reviewerList, int researchId) {
