@@ -24,7 +24,9 @@ public class SubmissionController {
         File selectedFile = fileChooser.showOpenDialog(new Stage());
 
         if (selectedFile != null) {
+            long start = System.nanoTime();
             submit(selectedFile);
+            System.out.printf("[Metrics] Execution time: %.3f ms%n", (System.nanoTime() - start) / 1_000_000.0);
         }
     }
 
