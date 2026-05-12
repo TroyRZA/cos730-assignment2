@@ -15,23 +15,16 @@ public class ReviewerManager {
     public void assignReviewers(int researchId) throws SQLException {
         System.out.println("ReviewerManager: called assignReviewers(researchId)");
         List<Reviewer> reviewers = database.fetchReviewers();
-        reviewers = filterConflicts(reviewers, researchId);
-        reviewers = checkWorkload(reviewers);
-        for (Reviewer reviewer : reviewers) {
+        List<Reviewer> filteredReviewers = selectReviewers(reviewers, researchId);
+        for (Reviewer reviewer : filteredReviewers) {
             database.assignReview(reviewer.getId(), researchId);
         }
     }
 
-    private List<Reviewer> filterConflicts(List<Reviewer> reviewers, int researchId) {
-        System.out.println("ReviewerManager: self-called filterConflicts(reviewerList)");
-        return reviewers.stream()
+    private List<Reviewer> selectReviewers(List<Reviewer> reviewerList, int researchId) {
+        System.out.println("ReviewerManager: self-called selectReviewers(reviewerList)");
+        return reviewerList.stream()
                 .filter(r -> r.getAssignedStudyId() != researchId)
-                .collect(Collectors.toList());
-    }
-
-    private List<Reviewer> checkWorkload(List<Reviewer> reviewers) {
-        System.out.println("ReviewerManager: self-called checkWorkload(reviewerList)");
-        return reviewers.stream()
                 .filter(r -> r.getStudyCount() <= 5)
                 .collect(Collectors.toList());
     }
