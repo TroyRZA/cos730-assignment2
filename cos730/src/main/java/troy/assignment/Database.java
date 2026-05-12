@@ -10,6 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class Database {
 
@@ -122,15 +123,18 @@ public class Database {
         }
     }
 
-    public void saveScore(int submissionId, int reviewerId, double score) throws SQLException {
-        System.out.println("EvaluationManager called: saveScore(score) on Database");
+    public void saveScores(int submissionId, Map<Integer, Double> reviewerScores) throws SQLException {
+        System.out.println("EvaluationManager called: saveScores() on Database");
         String sql = "INSERT OR REPLACE INTO scores (submission_id, reviewer_id, score) VALUES (?, ?, ?)";
         try (Connection conn = connect();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, submissionId);
-            stmt.setInt(2, reviewerId);
-            stmt.setDouble(3, score);
-            stmt.executeUpdate();
+            for (Map.Entry<Integer, Double> entry : reviewerScores.entrySet()) {
+                stmt.setInt(1, submissionId);
+                stmt.setInt(2, entry.getKey());
+                stmt.setDouble(3, entry.getValue());
+                stmt.addBatch();
+            }
+            stmt.executeBatch();
         }
     }
 

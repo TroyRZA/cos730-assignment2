@@ -1,7 +1,10 @@
 package troy.assignment;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.LinkedHashMap;
 
 public class EvaluationManager {
 
@@ -19,54 +22,46 @@ public class EvaluationManager {
     }
 
     public void startEvaluation(int submissionId, List<Reviewer> reviewers) throws SQLException {
-        System.out.println("SubmissionController: called startEvaluation() on EvaluationManager");
-        scores = new java.util.ArrayList<>();
-        System.out.println("loop [each reviewer]");
+        System.out.println("ReviewerManager: called startEvaluation() on EvaluationManager");
+        scores = new ArrayList<>();
+        Map<Integer, Double> reviewerScores = new LinkedHashMap<>();
+        System.out.println("loop [reviewers]");
         for (Reviewer reviewer : reviewers) {
-            double score = submitScore(submissionId);
-            database.saveScore(submissionId, reviewer.getId(), score);
+            double score = reviewer.submitScore();
+            reviewerScores.put(reviewer.getId(), score);
             scores.add(score);
         }
-        System.out.println("EvaluationManager self-called: calculateAverage()");
-        double average = calculateAverage();
-        System.out.println("EvaluationManager self-called: checkConsensus()");
-        boolean consensus = checkConsensus(average);
-        System.out.println("EvaluationManager self-called: applyRules()");
-        applyRules(average, consensus);
+        database.saveScores(submissionId, reviewerScores);
+        System.out.println("EvaluationManager self-called: evaluate()");
+        String result = evaluate();
+        System.out.println("EvaluationManager evaluate() result: " + result);
     }
 
-    private double calculateAverage() {
-        return scores.stream()
+    private String evaluate() {
+        double average = scores.stream()
                 .mapToDouble(Double::doubleValue)
                 .average()
                 .orElse(0.0);
-    }
 
-    private boolean checkConsensus(double average) {
         double standardDeviation = Math.sqrt(
                 scores.stream()
                         .mapToDouble(s -> Math.pow(s - average, 2))
                         .average()
                         .orElse(0.0));
-        return standardDeviation <= CONSENSUS_MAX_DEVIATION;
-    }
+        boolean consensus = standardDeviation <= CONSENSUS_MAX_DEVIATION;
 
-    public double submitScore(int submissionId) {
-        System.out.println("Reviewer: called submitScore on EvaluationManager");
-        return Math.round(Math.random() * 100);
-    }
-
-    private void applyRules(double average, boolean consensus) {
-        System.out.println("alt [accepted]");
         if (average >= ACCEPT_THRESHOLD && consensus) {
             System.out.println("EvaluationManager called: notifyAcceptance() on notificationService");
             notificationService.notifyAcceptance();
+            return "accepted";
         } else if (average >= REVISION_THRESHOLD) {
             System.out.println("EvaluationManager called: notifyRevision() on notificationService");
             notificationService.notifyRevision();
+            return "revision";
         } else {
             System.out.println("EvaluationManager called: notifyRejection() on notificationService");
             notificationService.notifyRejection();
+            return "rejected";
         }
     }
 }

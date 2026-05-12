@@ -38,4 +38,8 @@ public class Reviewer {
         database.assignReview(this.id, submissionId);
     }
 
+    public double submitScore() {
+        System.out.println("EvaluationManager: called submitScore() on Reviewer");
+        return Math.round(Math.random() * 100);
+    }
 }
