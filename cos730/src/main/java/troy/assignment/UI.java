@@ -13,7 +13,6 @@ public class UI {
 
     @FXML
     private void submit() {
-        System.out.println("UI: submit()");
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select CSV File");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
