@@ -34,7 +34,7 @@ public class EvaluationManager {
         database.saveScores(submissionId, reviewerScores);
         System.out.println("EvaluationManager self-called: evaluate()");
         String result = evaluate();
-        System.out.println("EvaluationManager evaluate() result: " + result);
+        notificationService.notify(result);
     }
 
     private String evaluate() {
@@ -51,16 +51,10 @@ public class EvaluationManager {
         boolean consensus = standardDeviation <= CONSENSUS_MAX_DEVIATION;
 
         if (average >= ACCEPT_THRESHOLD && consensus) {
-            System.out.println("EvaluationManager called: notifyAcceptance() on notificationService");
-            notificationService.notifyAcceptance();
             return "accepted";
         } else if (average >= REVISION_THRESHOLD) {
-            System.out.println("EvaluationManager called: notifyRevision() on notificationService");
-            notificationService.notifyRevision();
             return "revision";
         } else {
-            System.out.println("EvaluationManager called: notifyRejection() on notificationService");
-            notificationService.notifyRejection();
             return "rejected";
         }
     }

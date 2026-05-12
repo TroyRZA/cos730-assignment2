@@ -30,28 +30,25 @@ public class UI {
                 displayError();
             } else {
                 try {
-                    SubmissionController sc = new SubmissionController(message -> javafx.application.Platform.runLater(() -> {
-                        statusLabel.setText(message);
-                        statusLabel.setStyle("-fx-text-fill: blue;");
-                        statusLabel.setVisible(true);
-                        statusLabel.setManaged(true);
-                    }));
+                    SubmissionController sc = new SubmissionController(this::displayMessage);
                     sc.submit(selectedFile);
-                    statusLabel.setVisible(true);
-                    statusLabel.setManaged(true);
                 } catch (IOException e) {
-                    statusLabel.setText("Error reading file");
-                    statusLabel.setStyle("-fx-text-fill: red;");
-                    statusLabel.setVisible(true);
-                    statusLabel.setManaged(true);
+                    displayMessage("Error reading file");
                 } catch (SQLException e) {
-                    statusLabel.setText("Database error");
-                    statusLabel.setStyle("-fx-text-fill: red;");
-                    statusLabel.setVisible(true);
-                    statusLabel.setManaged(true);
+                    displayMessage("Database error");
                 }
             }
         }
+    }
+
+    public void displayMessage(String message) {
+        System.out.println("NotificationService called: displayMessage(result) on UI");
+        javafx.application.Platform.runLater(() -> {
+            statusLabel.setText(message);
+            statusLabel.setStyle("-fx-text-fill: blue;");
+            statusLabel.setVisible(true);
+            statusLabel.setManaged(true);
+        });
     }
 
     private void displayError() {
