@@ -5,11 +5,11 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.geometry.Insets?>
 
-<VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="troy.assignment.SubmissionController">
+<VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="troy.assignment.UI">
    <Label fx:id="statusLabel" text="" visible="false" />
    <children>
       <Label text="Submit Research Output" />
-      <Button fx:id="primaryButton" text="Submit Research Output" onAction="#submitResearchOutput"/>
+      <Button fx:id="primaryButton" text="Submit Research Output" onAction="#submit"/>
    </children>
    <padding>
       <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
