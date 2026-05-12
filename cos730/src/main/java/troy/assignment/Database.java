@@ -113,7 +113,7 @@ public class Database {
     }
 
     public void assignReview(int reviewerId, int submissionId) throws SQLException {
-        System.out.println("SubmissionController: assignReview()");
+        System.out.println("Reviewer called: assignReview(id, submissionId) on Database");
         String sql = "INSERT OR IGNORE INTO assignments (reviewer_id, submission_id) VALUES (?, ?)";
         try (Connection conn = connect();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {

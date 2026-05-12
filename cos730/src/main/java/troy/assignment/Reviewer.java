@@ -34,7 +34,7 @@ public class Reviewer {
     }
 
     public void assignReview(int submissionId) throws SQLException {
-        System.out.println("SubmissionController: called assignReview() on Reviewer");
+        System.out.println("ReviewerManager called: assignReview(researchId) on Reviewer");
         database.assignReview(this.id, submissionId);
     }
 
