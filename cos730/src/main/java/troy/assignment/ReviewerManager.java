@@ -15,17 +15,19 @@ public class ReviewerManager {
     }
 
     public void assignReviewers(int researchId) throws SQLException {
-        System.out.println("ReviewerManager: called assignReviewers(researchId)");
+        System.out.println("ReviewerManager calling fetchReviewers() on Database");
         List<Reviewer> reviewers = database.fetchReviewers();
+        System.out.println("ReviewerManager self-called selectReviewers(reviewersList)");
         List<Reviewer> filteredReviewers = selectReviewers(reviewers, researchId);
         for (Reviewer reviewer : filteredReviewers) {
+            System.out.println("ReviewerManager called assignReview(researchId) on Reviewer");
             reviewer.assignReview(researchId);
         }
+        System.out.println("ReviewerManager called startEvaluation on EvaluationManager");
         evaluationManager.startEvaluation(researchId, filteredReviewers);
     }
 
     private List<Reviewer> selectReviewers(List<Reviewer> reviewerList, int researchId) {
-        System.out.println("ReviewerManager: self-called selectReviewers(reviewerList)");
         return reviewerList.stream()
                 .filter(r -> r.getAssignedStudyId() != researchId)
                 .filter(r -> r.getStudyCount() <= 5)

@@ -1,8 +1,6 @@
 package troy.assignment;
 
 import java.io.File;
-import java.io.IOException;
-import java.sql.SQLException;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -15,34 +13,25 @@ public class UI {
 
     @FXML
     private void submit() {
-        System.out.println("Researcher clicked: submitResearchOutput");
+        System.out.println("UI: submit()");
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select CSV File");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
         File selectedFile = fileChooser.showOpenDialog(new Stage());
 
         if (selectedFile != null) {
-            System.out.println("UI: submit(data)");
-            Validator validator = new Validator();
+            System.out.println("UI: calling Validator.validateFormat()");
+            Validator validator = new Validator(this::displayMessage);
             boolean isValid = validator.validateFormat(selectedFile);
 
             if (!isValid) {
                 displayError();
-            } else {
-                try {
-                    SubmissionController sc = new SubmissionController(this::displayMessage);
-                    sc.submit(selectedFile);
-                } catch (IOException e) {
-                    displayMessage("Error reading file");
-                } catch (SQLException e) {
-                    displayMessage("Database error");
-                }
             }
         }
     }
 
     public void displayMessage(String message) {
-        System.out.println("NotificationService called: displayMessage(result) on UI");
+        System.out.println("UI: displayMessage(" + message + ")");
         javafx.application.Platform.runLater(() -> {
             statusLabel.setText(message);
             statusLabel.setStyle("-fx-text-fill: blue;");

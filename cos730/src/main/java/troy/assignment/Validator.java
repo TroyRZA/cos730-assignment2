@@ -4,10 +4,12 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
+import java.util.function.Consumer;
 
 public class Validator {
 
@@ -15,12 +17,32 @@ public class Validator {
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final String DELIMITER = ",";
 
+    private final Consumer<String> onStatus;
+
+    public Validator(Consumer<String> onStatus) {
+        this.onStatus = onStatus;
+    }
+
     public boolean validateFormat(File file) {
-        System.out.println("Validator: validateFormat(data)");
         if (!file.getName().toLowerCase().endsWith(".csv")) {
             return false;
         }
-        return validate(file);
+
+        boolean isValid = validate(file);
+
+        if (isValid) {
+            try {
+                System.out.println("Validator: calling SubmissionController.submit()");
+                SubmissionController sc = new SubmissionController(onStatus);
+                sc.submit(file);
+            } catch (IOException e) {
+                onStatus.accept("Error reading file");
+            } catch (SQLException e) {
+                onStatus.accept("Database error");
+            }
+        }
+
+        return isValid;
     }
 
     private boolean validate(File file) {
