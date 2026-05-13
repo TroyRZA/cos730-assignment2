@@ -25,12 +25,12 @@ public class Reviewer {
         return name;
     }
 
-    public int getAssignedStudyId() {
-        return assignedStudyId;
+    public boolean hasConflict(int researchId) {
+        return this.assignedStudyId == researchId;
     }
 
-    public int getStudyCount() {
-        return studyCount;
+    public boolean hasCapacity() {
+        return this.studyCount <= 5;
     }
 
     public void assignReview(int submissionId) throws SQLException {

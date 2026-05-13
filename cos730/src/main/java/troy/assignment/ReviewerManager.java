@@ -29,9 +29,8 @@ public class ReviewerManager {
 
     private List<Reviewer> selectReviewers(List<Reviewer> reviewerList, int researchId) {
         return reviewerList.stream()
-                .filter(r -> r.getAssignedStudyId() != researchId)
-                .filter(r -> r.getStudyCount() <= 5)
+                .filter(r -> !r.hasConflict(researchId))
+                .filter(Reviewer::hasCapacity)
                 .collect(Collectors.toList());
     }
-
 }
